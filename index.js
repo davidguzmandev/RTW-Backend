@@ -16,7 +16,7 @@ const app = express();
 const port = process.env.PORT || 5000; // Puerto para el servidor
 
 //Middleware
-app.use('*', cors({ origin: 'https://rtw-frontend.vercel.app' }));
+
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -29,6 +29,22 @@ const storage = multer.diskStorage({
         cb(null, file.originalname);
     },
 });
+
+const dominiosPermitidos = [process.env.FRONTEND_URL]
+const corsOptions = {
+    origin: function(origin, callback){
+        console.log(`Origen de la solicitud: ${origin}`); // Logging para depuración
+        console.log(`Dominios permitidos: ${dominiosPermitidos}`); // Muestra los dominios permitidos
+        if (dominiosPermitidos.indexOf(origin) !== -1){
+            // El origen del request es permitido
+            callback(null, true)
+        } else {
+            callback (new Error('No permitido por CORS'))
+        }
+    }
+}
+
+app.use(cors(corsOptions))
 
 const upload = multer({ storage });
 
