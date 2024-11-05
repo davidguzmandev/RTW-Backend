@@ -45,6 +45,7 @@ const corsOptions = {
 }
 
 app.use(cors(corsOptions))
+app.options('*', cors(corsOptions)); 
 
 const upload = multer({ storage });
 
