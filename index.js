@@ -16,7 +16,7 @@ const app = express();
 const port = process.env.PORT || 5000; // Puerto para el servidor
 
 //Middleware
-app.use(cors());
+app.use(cors({ origin: 'https://rtw-frontend.vercel.app/' }));
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
