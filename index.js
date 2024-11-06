@@ -15,12 +15,13 @@ const app = express();
 
 app.use(cors({
     origin: 'https://rtw-frontend.vercel.app',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: "GET,OPTIONS,PATCH,DELETE,POST,PUT",
+    allowedHeaders: "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
     credentials: true
 }));
 
-app.options('*', cors());
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 const port = process.env.PORT || 5000; // Puerto para el servidor
 
