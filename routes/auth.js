@@ -6,23 +6,6 @@ const User = require('../models/User'); // Importar el modelo de usuario
 const fs = require('fs'); // Asegúrate de que esta línea esté presente */
 const router = express.Router();
 
-/* const usersFilePath = path.join(__dirname, '../data/users.json'); */
-
-/* // Leer usuarios desde el archivo JSON
-const getUsers = () => {
-    try {
-        const data = fs.readFileSync(usersFilePath, 'utf-8');
-        return JSON.parse(data);
-    } catch (error) {
-        return [];
-    }
-};
-
-// Escribir usuarios al archivo JSON
-const saveUsers = (users) => {
-    fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2));
-}; */
-
 // Registro de usuario
 router.post('/register', async (req, res) => {
     const { email, password } = req.body;
