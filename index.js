@@ -45,7 +45,24 @@ const corsOptions = {
 }
 
 app.use(cors(corsOptions))
-app.options('*', cors(corsOptions)); 
+
+function setCorsHeaders(req, res, next) {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    );
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  
+    if (req.method === "OPTIONS") {
+      // Respond to preflight requests
+      return res.status(200).end();
+    }
+  
+    next();
+  }
+  
+  app.use(setCorsHeaders);
 
 const upload = multer({ storage });
 
