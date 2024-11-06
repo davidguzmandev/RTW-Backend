@@ -11,8 +11,17 @@ require('dotenv').config();
 connectDB(); // Conectar a MongoDB
 
 const Client = require('./models/Client'); // Importar el modelo Client
-
 const app = express();
+
+app.use(cors({
+    origin: 'https://rtw-frontend.vercel.app',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
+
+app.options('*', cors());
+
 const port = process.env.PORT || 5000; // Puerto para el servidor
 
 //Middleware
@@ -30,21 +39,6 @@ const storage = multer.diskStorage({
     },
 });
 
-const dominiosPermitidos = [process.env.FRONTEND_URL, process.env.FRONTEND_URL2, process.env.FRONTEND_URL3]
-const corsOptions = {
-    origin: function(origin, callback){
-        console.log(`Origen de la solicitud: ${origin}`); // Logging para depuracións
-        console.log(`Dominios permitidos: ${dominiosPermitidos}`); // Muestra los dominios permitidos
-        if (dominiosPermitidos.indexOf(origin) !== -1){
-            // El origen del request es permitido
-            callback(null, true)
-        } else {
-            callback (new Error('No permitido por CORS'))
-        }
-    }
-}
-
-app.use(cors(corsOptions))
 
 function setCorsHeaders(req, res, next) {
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -62,7 +56,7 @@ function setCorsHeaders(req, res, next) {
     next();
   }
   
-  app.use(setCorsHeaders);
+app.use(setCorsHeaders);
 
 const upload = multer({ storage });
 
