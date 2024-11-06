@@ -30,10 +30,10 @@ const storage = multer.diskStorage({
     },
 });
 
-const dominiosPermitidos = [process.env.FRONTEND_URL]
+const dominiosPermitidos = [process.env.FRONTEND_URL, process.env.FRONTEND_URL2, process.env.FRONTEND_URL3]
 const corsOptions = {
     origin: function(origin, callback){
-        console.log(`Origen de la solicitud: ${origin}`); // Logging para depuración
+        console.log(`Origen de la solicitud: ${origin}`); // Logging para depuracións
         console.log(`Dominios permitidos: ${dominiosPermitidos}`); // Muestra los dominios permitidos
         if (dominiosPermitidos.indexOf(origin) !== -1){
             // El origen del request es permitido
