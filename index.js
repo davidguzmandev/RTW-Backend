@@ -13,7 +13,13 @@ connectDB(); // Conectar a MongoDB
 const Client = require('./models/Client'); // Importar el modelo Client
 const app = express();
 
-app.use(cors());
+// Configuración de CORS
+const corsOptions = {
+    origin: 'https://rtw-frontend.vercel.app/', // Permite solicitudes de tu frontend
+    methods: ['GET', 'POST'], // Métodos permitidos
+    allowedHeaders: ['Content-Type', 'Authorization'] // Encabezados permitidos
+  };
+
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
