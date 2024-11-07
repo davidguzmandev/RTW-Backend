@@ -27,18 +27,30 @@ router.post('/register', async (req, res) => {
 
 //Recibe la solicitud get del frontend y la convierte a post, esto por el problema CORS
 router.get('/', async (req, res) => {
+    const { email, password } = req.query; // Se usa query en lugar de body
+    
+    // Llamar directamente a la lógica de autenticación, como si fuera un POST
     try {
-        // Extrae los datos del query (GET) y los estructura como cuerpo de solicitud
-        const { email, password } = req.query; // Usa query en lugar de body
-        
-        // Crea un objeto que simula el cuerpo de la solicitud POST
-        req.body = { email, password };
-        
-        // Llama a la lógica de autenticación ya definida en el endpoint POST
-        router.handle({ ...req, method: 'POST' }, res); // Cambia a POST internamente
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(400).json({ error: 'Credenciales inválidas' });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ error: 'Credenciales inválidas' });
+        }
+
+        const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
+            expiresIn: '1h',
+        });
+
+        const { password: _, ...userWithoutPassword } = user.toObject();
+        res.json({ token, user: userWithoutPassword });
     } catch (error) {
-        console.error('Error al reenviar la solicitud como POST:', error);
-        res.status(500).json({ error: 'Error en el servidor' });
+        console.error('Error al iniciar sesión:', error);
+        res.status(500).json({ error: 'Error al iniciar sesión' });
     }
 });
 
