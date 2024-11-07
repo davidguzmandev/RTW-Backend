@@ -2,8 +2,6 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User'); // Importar el modelo de usuario
-/* const path = require('path'); // Asegúrate de que esta línea esté presente
-const fs = require('fs'); // Asegúrate de que esta línea esté presente */
 const router = express.Router();
 
 // Registro de usuario
@@ -73,5 +71,7 @@ router.post('/', async (req, res) => {
         res.status(500).json({ error: 'Error al iniciar sesión' });
     }
 });
+
+res.status(400).json({ error: 'Credenciales inválidas' });
 
 module.exports = router;
