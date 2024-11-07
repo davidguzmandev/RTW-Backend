@@ -27,11 +27,26 @@ router.post('/register', async (req, res) => {
     }
 });
 
+//Recibe la solicitud get del frontend y la convierte a post, esto por el problema CORS
+router.get('/', async (req, res) => {
+    try {
+        // Extrae los datos del query (GET) y los estructura como cuerpo de solicitud
+        const { email, password } = req.query; // Usa query en lugar de body
+        
+        // Crea un objeto que simula el cuerpo de la solicitud POST
+        req.body = { email, password };
+        
+        // Llama a la lógica de autenticación ya definida en el endpoint POST
+        router.handle({ ...req, method: 'POST' }, res); // Cambia a POST internamente
+    } catch (error) {
+        console.error('Error al reenviar la solicitud como POST:', error);
+        res.status(500).json({ error: 'Error en el servidor' });
+    }
+});
+
 // Iniciar sesión
 router.post('/', async (req, res) => {
     const { email, password } = req.body;
-/*     const users = getUsers();
-    const user = users.find(user => user.email === email); */
     const user = await User.findOne({ email });
 
     try {
