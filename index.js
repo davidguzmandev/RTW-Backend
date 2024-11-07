@@ -13,11 +13,11 @@ connectDB(); // Conectar a MongoDB
 const Client = require('./models/Client'); // Importar el modelo Client
 const app = express();
 
-const APIURL = process.env.FRONTEND_URL
+const FRONTEND_URL = process.env.FRONTEND_URL
 
 // Configuración de CORS
 const corsOptions = {
-    origin: `${APIURL}`, // Permite solicitudes de tu frontend
+    origin: `${FRONTEND_URL}`, // Permite solicitudes de tu frontend
     methods: ['GET', 'POST'], // Métodos permitidos
     allowedHeaders: ['Content-Type', 'Authorization'] // Encabezados permitidos
   };

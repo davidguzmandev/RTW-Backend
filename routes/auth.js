@@ -27,6 +27,7 @@ router.post('/register', async (req, res) => {
 
 //Recibe la solicitud get del frontend y la convierte a post, esto por el problema CORS
 router.get('/', async (req, res) => {
+    console.log('Entro al get de login');
     const { email, password } = req.query; // Se usa query en lugar de body
     
     // Llamar directamente a la lógica de autenticación, como si fuera un POST
