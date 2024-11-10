@@ -18,11 +18,11 @@ const FRONTEND_URL = process.env.FRONTEND_URL
 
 // Configuración de CORS
 const corsOptions = {
-    origin: '*', // Permite solicitudes de tu frontend
-    methods: ['GET', 'POST'], // Métodos permitidos
-    allowedHeaders: ['Content-Type', 'Authorization'] // Encabezados permitidos
-  };
-
+    origin: '*', // Permite solicitudes desde cualquier origen
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // Métodos permitidos
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'], // Encabezados permitidos
+    credentials: true, // Si necesitas permitir cookies o autenticación en las solicitudes
+};
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
@@ -70,33 +70,26 @@ app.get('/api/time', async (req, res) => {
     }
 });
 
-app.patch('/api/timePunchOut', (req, res) => {
+app.patch('/api/timePunchOut', async (req, res) => {
     const { id, punchOutTime, punchOutLocation, open } = req.body;
-    const filePath = path.join(__dirname, 'data', 'timeRecording.json');
   
-    fs.readFile(filePath, 'utf8', (err, data) => {
-      if (err) {
-        console.error('Error al leer el archivo:', err);
-        return res.status(500).json({ error: 'Error al leer el archivo' });
-      }
-  
-      // Parsear y buscar el registro por ID
-      let records = JSON.parse(data);
-      const recordIndex = records.findIndex((record) => record.id === id);
-  
-      if (recordIndex === -1) {
-        return res.status(404).json({ error: 'Registro no encontrado' });
-      }
-  
-      // Obtener los valores de hourOpen y punchOutTime y calcular la duración
-      const hourOpen = new Date(`1970-01-01T${records[recordIndex].hourOpen}:00`);
-      const punchOut = new Date(`1970-01-01T${punchOutTime}:00`);
-      const timeDifference = punchOut - hourOpen;
+    try {
+        // Buscar el registro en MongoDB por el ID
+        const record = await TimeRecording.findOne({ id });
 
-      // Convertir la diferencia a horas y minutos
-      const hours = Math.floor(timeDifference / (1000 * 60 * 60));
-      const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
-      const duration = `${hours}h ${minutes}m`;
+        if (!record) {
+            return res.status(404).json({ error: 'Registro no encontrado' });
+        }
+
+        // Obtener los valores de hourOpen y punchOutTime y calcular la duración
+        const hourOpen = new Date(`1970-01-01T${record.hourOpen}:00`);
+        const punchOut = new Date(`1970-01-01T${punchOutTime}:00`);
+        const timeDifference = punchOut - hourOpen;
+
+        // Convertir la diferencia a horas y minutos
+        const hours = Math.floor(timeDifference / (1000 * 60 * 60));
+        const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+        const duration = `${hours}h ${minutes}m`;
 
       // Actualizar la hora y ubicación de punch-out ademas del campo open
       records[recordIndex] = {
@@ -107,68 +100,42 @@ app.patch('/api/timePunchOut', (req, res) => {
         duration
       };
   
-      // Guardar el archivo actualizado
-      fs.writeFile(filePath, JSON.stringify(records, null, 2), (writeErr) => {
-        if (writeErr) {
-          console.error('Error al escribir en el archivo:', writeErr);
-          return res.status(500).json({ error: 'Error al guardar los datos' });
-        }
-        res.status(200).json({ message: 'Punch-out registrado correctamente' });
-      });
-    });
-  });
+      // Guardar el registro actualizado en MongoDB
+      await record.save();
+
+      res.status(200).json({ message: 'Punch-out registrado correctamente' });
+
+  } catch (error) {
+      console.error('Error al procesar la solicitud:', error);
+      res.status(500).json({ error: 'Error al procesar la solicitud' });
+  }
+});
 
 //Ruta para guardar los datos de horas en el JSON
-app.post('/api/saveData', (req, res) => {
-
+app.post('/api/saveData', async (req, res) => {
     const data = req.body.data;
-    //Directorio donde se guardaran los datos
-    const filePath = path.join(__dirname, 'data', 'timeRecording.json');
 
-    //Leer los datos existentes
-    fs.readFile(filePath, 'utf8', (err, fileData) => {
+    try {
+        // Crear un nuevo registro en la base de datos utilizando el modelo
+        const newRecord = new TimeRecording(data);
 
-        if (err) {
-            console.error('Error al leer el archivo:', err);
-            return res.status(500).json({ error: 'Error al leer el archivo' });
-        }
+        // Guardar el nuevo registro en MongoDB
+        await newRecord.save();
 
-        let jsonData = [];
-
-        // Verificar si hay datos existentes en el archivo
-        if (fileData) {
-            jsonData = JSON.parse(fileData);
-        }
-
-        // Agregar los nuevos datos
-        jsonData.push(data);
-
-        // Guardar los datos actualizados en el archivo
-        fs.writeFile(filePath, JSON.stringify(jsonData, null, 2), (err) => {
-            if (err) {
-                console.error('Error al escribir en el archivo:', err);
-                return res.status(500).json({ error: 'Error al guardar los datos' });
-            }
-
-            res.status(200).json({ message: 'Datos guardados exitosamente' });
-        });
-    });
+        res.status(200).json({ message: 'Datos guardados exitosamente' });
+    } catch (err) {
+        console.error('Error al guardar los datos:', err);
+        return res.status(500).json({ error: 'Error al guardar los datos' });
+    }
 });
 
 // Endpoint para exportar los datos a Excel
-app.get('/api/exportExcel', (req, res) => {
-    const filePath = path.join(__dirname, 'data', 'timeRecording.json');
+app.get('/api/exportExcel', async (req, res) => {
+    try {
+        // Obtener todos los registros de MongoDB
+        const records = await TimeRecording.find();
 
-    // Leer los datos de timeRecording.json
-    fs.readFile(filePath, 'utf8', (err, data) => {
-        if (err) {
-          console.error('Error al leer el archivo:', err);
-          return res.status(500).json({ error: 'Error al leer el archivo' });
-        }
-        // Parsear el JSON y convertirlo a una hoja de Excel
-        const records = JSON.parse(data);
-        const workbook = XLSX.utils.book_new();
-        
+        // Convertir los registros a formato adecuado para Excel
         const excelData = records.map(record => ({
             'Email': record.email,
             'Employee Name': record.name,
@@ -186,7 +153,9 @@ app.get('/api/exportExcel', (req, res) => {
             'End Location Longitude': record.punchOutLocation?.longitude,
             'Is Open': record.open
         }));
-        
+
+        // Crear un libro de trabajo y una hoja de Excel
+        const workbook = XLSX.utils.book_new();
         const worksheet = XLSX.utils.json_to_sheet(excelData);
         XLSX.utils.book_append_sheet(workbook, worksheet, 'Time Records');
 
@@ -208,7 +177,10 @@ app.get('/api/exportExcel', (req, res) => {
                 }
             });
         });
-    });
+    } catch (err) {
+        console.error('Error al procesar los datos:', err);
+        return res.status(500).json({ error: 'Error al obtener los registros' });
+    }
 });
 
 // Iniciar el servidor
