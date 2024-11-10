@@ -17,7 +17,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL
 
 // Configuración de CORS
 const corsOptions = {
-    origin: `${FRONTEND_URL}`, // Permite solicitudes de tu frontend
+    origin: '*', // Permite solicitudes de tu frontend
     methods: ['GET', 'POST'], // Métodos permitidos
     allowedHeaders: ['Content-Type', 'Authorization'] // Encabezados permitidos
   };
