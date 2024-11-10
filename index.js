@@ -47,6 +47,7 @@ const upload = multer({ storage });
 
 // Rutas
 app.use('/api/auth', authRoutes);
+app.use('/api/user', authRoutes);
 
 // Endpoint para obtener los clientes desde MongoDB
 app.get('/api/clients', async (req, res) => {
