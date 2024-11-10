@@ -11,6 +11,7 @@ require('dotenv').config();
 connectDB(); // Conectar a MongoDB
 
 const Client = require('./models/Client'); // Importar el modelo Client
+const TimeRecording = require('./models/TimeRecording'); // Importar el modelo TimeRecording
 const app = express();
 
 const FRONTEND_URL = process.env.FRONTEND_URL
@@ -45,7 +46,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Rutas
-app.use('/api/auth/', authRoutes);
+app.use('/api/auth', authRoutes);
 
 // Endpoint para obtener los clientes desde MongoDB
 app.get('/api/clients', async (req, res) => {
@@ -58,14 +59,15 @@ app.get('/api/clients', async (req, res) => {
     }
 });
 
-// Endpoint para leer el archivo timeRecording.json
-app.get('/api/time', (req, res) => {
-    fs.readFile(path.join(__dirname, 'data', 'timeRecording.json'), 'utf8', (err, data) => {
-        if (err) {
-            return res.status(500).json({ error: 'Error al leer el archivo' });
-        }
-        res.json(JSON.parse(data));
-    });
+// Endpoint para leer el archivo antes: timeRecording.json ahora desde MongoDB
+app.get('/api/time', async (req, res) => {
+    try {
+        // Consulta todos los registros de tiempo en la base de datos
+        const timeRecords = await TimeRecording.find();
+        res.json(timeRecords); // Enviar los datos al cliente en formato JSON
+    } catch (err) {
+        res.status(500).json({ error: 'Error al obtener los registros de tiempo' });
+    }
 });
 
 app.patch('/api/timePunchOut', (req, res) => {
