@@ -25,7 +25,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
-const port = process.env.PORT || 5000; // Puerto para el servidor
+const port = process.env.PORT || 3001; // Puerto para el servidor
 
 //Middleware
 
