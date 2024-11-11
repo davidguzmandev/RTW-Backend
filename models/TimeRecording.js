@@ -6,8 +6,8 @@ const timeRecordingSchema = new mongoose.Schema({
   email: { type: String, required: true }, // Email del usuario
   client: { type: String, required: true }, // Cliente
   work: { 
-    Commercial: { type: Boolean, required: true },
-    'Displacement KM': { type: Boolean, required: true }
+    Commercial: { type: Boolean, required: false },
+    'Displacement KM': { type: Boolean, required: false }
   }, // Trabajo realizado, usando un objeto con claves de trabajos y valores booleanos
   date: { type: String, required: true }, // Fecha del registro
   hourOpen: { type: String, required: true }, // Hora de entrada
@@ -18,10 +18,10 @@ const timeRecordingSchema = new mongoose.Schema({
     longitude: { type: Number, required: true } // Longitud
   },
   open: { type: Boolean, required: true }, // Indica si está abierto
-  punchOutTime: { type: String, required: true }, // Hora de salida
+  punchOutTime: { type: String, required: false }, // Hora de salida
   punchOutLocation: {
-    latitude: { type: Number, required: true }, // Latitud de salida
-    longitude: { type: Number, required: true } // Longitud de salida
+    latitude: { type: Number, required: false }, // Latitud de salida
+    longitude: { type: Number, required: false } // Longitud de salida
   },
   duration: { type: String, required: false } // Duración del trabajo
 });
