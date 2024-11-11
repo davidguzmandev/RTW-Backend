@@ -19,7 +19,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL
 // Configuración de CORS
 const corsOptions = {
     origin: '*', // Permite solicitudes desde cualquier origen
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // Métodos permitidos
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], // Métodos permitidos
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'], // Encabezados permitidos
     credentials: true, // Si necesitas permitir cookies o autenticación en las solicitudes
 };
@@ -185,6 +185,6 @@ app.get('/api/exportExcel', async (req, res) => {
 });
 
 // Iniciar el servidor
-app.listen(port,'0.0.0.0', () => {
-    console.log(`Servidor escuchando en http://0.0.0.0:${port}`);
+app.listen(port, () => {
+    console.log(`Servidor escuchando en http://localhost:${port}`);
 });
