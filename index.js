@@ -92,14 +92,11 @@ app.patch('/api/timePunchOut', async (req, res) => {
         const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
         const duration = `${hours}h ${minutes}m`;
 
-      // Actualizar la hora y ubicación de punch-out ademas del campo open
-      records[recordIndex] = {
-        ...records[recordIndex],
-        punchOutTime,
-        punchOutLocation,
-        open,
-        duration
-      };
+        // Actualizar los campos en el documento encontrado
+        record.punchOutTime = punchOutTime;
+        record.punchOutLocation = punchOutLocation;
+        record.open = open;
+        record.duration = duration;
   
       // Guardar el registro actualizado en MongoDB
       await record.save();
