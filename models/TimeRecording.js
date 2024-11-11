@@ -26,6 +26,6 @@ const timeRecordingSchema = new mongoose.Schema({
   duration: { type: String, required: false } // Duración del trabajo
 });
 
-const TimeRecording = mongoose.model('TimeRecording', timeRecordingSchema);
+const TimeRecording = mongoose.model('TimeRecording', timeRecordingSchema, 'records');
 
 module.exports = TimeRecording;
