@@ -7,7 +7,9 @@ const timeRecordingSchema = new mongoose.Schema({
   client: { type: String, required: true }, // Cliente
   work: { 
     Commercial: { type: Boolean, required: false },
-    'Displacement KM': { type: Boolean, required: false }
+    Supervisor: { type: Boolean, required: false },
+    Residential: { type: Boolean, required: false },
+    Displacement: { type: Boolean, required: false }
   }, // Trabajo realizado, usando un objeto con claves de trabajos y valores booleanos
   date: { type: String, required: true }, // Fecha del registro
   hourOpen: { type: String, required: true }, // Hora de entrada

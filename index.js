@@ -112,8 +112,7 @@ app.patch('/api/timePunchOut', async (req, res) => {
 //Ruta para guardar los datos de horas en el JSON
 app.post('/api/saveData', async (req, res) => {
     const data = req.body.data;
-    console.log(req.body.data);
-
+    
     try {
         // Crear un nuevo registro en la base de datos utilizando el modelo
         const newRecord = new TimeRecording(data);
