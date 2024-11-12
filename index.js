@@ -157,24 +157,15 @@ app.get('/api/exportExcel', async (req, res) => {
         const worksheet = XLSX.utils.json_to_sheet(excelData);
         XLSX.utils.book_append_sheet(workbook, worksheet, 'Time Records');
 
-        // Generar un archivo Excel temporal
-        const excelFilePath = path.join(__dirname, 'data', 'timeRecording.xlsx');
-        XLSX.writeFile(workbook, excelFilePath);
+        // Generar el archivo Excel en un buffer
+        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
 
-        // Enviar el archivo Excel al cliente
-        res.download(excelFilePath, 'timeRecording.xlsx', (downloadErr) => {
-            if (downloadErr) {
-                console.error('Error al descargar el archivo:', downloadErr);
-                return res.status(500).json({ error: 'Error al descargar el archivo' });
-            }
-
-            // Eliminar el archivo temporal después de enviarlo
-            fs.unlink(excelFilePath, (unlinkErr) => {
-                if (unlinkErr) {
-                    console.error('Error al eliminar el archivo temporal:', unlinkErr);
-                }
-            });
-        });
+        // Configurar encabezados para la respuesta de descarga
+        res.setHeader('Content-Disposition', 'attachment; filename="timeRecording.xlsx"');
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        
+        // Enviar el buffer como respuesta
+        res.send(excelBuffer);
     } catch (err) {
         console.error('Error al procesar los datos:', err);
         return res.status(500).json({ error: 'Error al obtener los registros' });
