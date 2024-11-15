@@ -47,7 +47,6 @@ router.post('/', async (req, res) => {
     const user = await User.findOne({ email });
 
     try {
-        console.log('Sesion iniciada');
         // Buscar el usuario en la base de datos
         if (!user) {
             return res.status(400).json({ error: 'Credenciales inválidas' });
@@ -58,15 +57,18 @@ router.post('/', async (req, res) => {
             return res.status(400).json({ error: 'Credenciales inválidas' });
         }
 
-        const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
-            expiresIn: '1h',
+        const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET);
+
+         // Configurar la cookie de sesión (sin maxAge)
+         res.cookie('authToken', token, {
+            httpOnly: true,       // Solo accesible desde el servidor
+            sameSite: 'strict',   // Protección contra CSRF
         });
 
         // Devuelve el token y el usuario (sin la contraseña)
         const { password: _, ...userWithoutPassword } = user.toObject(); // Desestructuración para eliminar la contraseña
         res.json({ token, user: userWithoutPassword }); // Devuelve el token y el usuario
     } catch (error) {
-        console.error('Error al iniciar sesión:', error);
         res.status(500).json({ error: 'Error al iniciar sesión' });
     }
 });
