@@ -4,7 +4,6 @@ const bodyParser = require('body-parser');
 const multer = require('multer');
 const authRoutes = require('./routes/auth');
 const fs = require('fs');
-const path = require('path');
 const XLSX = require('xlsx');
 const connectDB = require('./routes/db');
 require('dotenv').config();
@@ -13,8 +12,6 @@ connectDB(); // Conectar a MongoDB
 const Client = require('./models/Client'); // Importar el modelo Client
 const TimeRecording = require('./models/TimeRecording'); // Importar el modelo TimeRecording
 const app = express();
-
-const FRONTEND_URL = process.env.FRONTEND_URL
 
 // Configuración de CORS
 const corsOptions = {
@@ -163,7 +160,7 @@ app.get('/api/exportExcel', async (req, res) => {
         // Configurar encabezados para la respuesta de descarga
         res.setHeader('Content-Disposition', 'attachment; filename="timeRecording.xlsx"');
         res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        
+
         // Enviar el buffer como respuesta
         res.send(excelBuffer);
     } catch (err) {

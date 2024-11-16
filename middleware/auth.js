@@ -12,4 +12,12 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
-module.exports = authenticateToken;
+const authorizeRoles = (...roles) => (req, res, next) => {
+    const { role } = req.user;
+    if (!roles.includes(role)) {
+        return res.status(403).json({ error: 'No tienes permiso para acceder a este recurso' });
+    }
+    next();
+};
+
+module.exports = {authenticateToken, authorizeRoles};
