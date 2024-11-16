@@ -69,7 +69,7 @@ app.get('/api/time', async (req, res) => {
 });
 
 app.patch('/api/timePunchOut', async (req, res) => {
-    const { id, punchOutTime, punchOutLocation, open } = req.body;
+    const { id, punchOutTime, punchOutLocation, punchOutDate, open } = req.body;
   
     try {
         // Buscar el registro en MongoDB por el ID
@@ -80,8 +80,22 @@ app.patch('/api/timePunchOut', async (req, res) => {
         }
 
         // Obtener los valores de hourOpen y punchOutTime y calcular la duración
-        const hourOpen = new Date(`1970-01-01T${record.hourOpen}:00`);
-        const punchOut = new Date(`1970-01-01T${punchOutTime}:00`);
+        const hourOpen = new Date(`${record.date}T${record.hourOpen}:00`);
+        const punchOut = new Date(`${punchOutDate}T${punchOutTime}:00`);
+
+        // Verificar si las fechas coinciden
+        if (hourOpen !== punchOut) {
+            // Actualizar los campos para el caso de fecha diferente
+            record.punchOutTime = punchOutTime;
+            record.punchOutLocation = punchOutLocation;
+            record.open = open;
+            record.duration = 'Ha pasado la media noche';
+
+            // Guardar el registro actualizado y terminar la respuesta
+            await record.save();
+            return res.status(200).json({ message: 'Punch-out registrado correctamente (fecha diferente)' });
+        }
+
         const timeDifference = punchOut - hourOpen;
 
         // Convertir la diferencia a horas y minutos
@@ -97,7 +111,6 @@ app.patch('/api/timePunchOut', async (req, res) => {
   
       // Guardar el registro actualizado en MongoDB
       await record.save();
-
       res.status(200).json({ message: 'Punch-out registrado correctamente' });
 
   } catch (error) {
