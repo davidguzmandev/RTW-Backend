@@ -82,9 +82,11 @@ app.patch('/api/timePunchOut', async (req, res) => {
         // Obtener los valores de hourOpen y punchOutTime y calcular la duración
         const hourOpen = new Date(`${record.date}T${record.hourOpen}:00`);
         const punchOut = new Date(`${punchOutDate}T${punchOutTime}:00`);
+        console.log(record.date);
+        console.log(punchOutDate);
 
         // Verificar si las fechas coinciden
-        if (hourOpen !== punchOut) {
+        if (record.date !== punchOutDate) {
             // Actualizar los campos para el caso de fecha diferente
             record.punchOutTime = punchOutTime;
             record.punchOutLocation = punchOutLocation;
