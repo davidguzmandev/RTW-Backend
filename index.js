@@ -71,7 +71,7 @@ app.get('/api/time', async (req, res) => {
 });
 
 app.patch('/api/timePunchOut', async (req, res) => {
-    const { id, punchOutTime, punchOutLocation, punchOutDate, open } = req.body;
+    const { id, punchOutTime, punchOutLocation, punchOutDate, open, comment2 } = req.body;
   
     try {
         // Buscar el registro en MongoDB por el ID
@@ -92,6 +92,7 @@ app.patch('/api/timePunchOut', async (req, res) => {
             record.punchOutLocation = punchOutLocation;
             record.open = open;
             record.duration = "It's been more than 12 hours";
+            record.comment2 = comment2;
 
             // Guardar el registro actualizado y terminar la respuesta
             await record.save();
@@ -110,6 +111,7 @@ app.patch('/api/timePunchOut', async (req, res) => {
         record.punchOutLocation = punchOutLocation;
         record.open = open;
         record.duration = duration;
+        record.comment2 = comment2;
   
       // Guardar el registro actualizado en MongoDB
       await record.save();
@@ -156,8 +158,8 @@ app.get('/api/exportExcel', async (req, res) => {
             'End Time': record.punchOutTime,
             'Working Hours': record.duration,
             'Kilometers': record.km,
-            'Comment1': record.comment1,
-            'Comment2': record.comment2,
+            'Open Comment': record.comment1,
+            'Close Comment': record.comment2,
             'Start Location Latitude': record.location.latitude,
             'Start Location Longitude': record.location.longitude,
             'End Location Latitude': record.punchOutLocation?.latitude,
