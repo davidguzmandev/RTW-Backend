@@ -72,7 +72,7 @@ app.get('/api/time', async (req, res) => {
 
 app.patch('/api/timePunchOut', async (req, res) => {
     const { id, punchOutTime, punchOutLocation, punchOutDate, open, comment2 } = req.body;
-  
+
     try {
         // Buscar el registro en MongoDB por el ID
         const record = await TimeRecording.findOne({ id });
